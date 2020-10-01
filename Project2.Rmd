@@ -33,4 +33,35 @@ Analysis
 
 
 
-# Data 2 - 
+# Data 2 - Police Killings Since 2015
+Datasets 
+Main Data - https://www.kaggle.com/kwullum/fatal-police-shootings-in-the-us
+Most recent data - https://github.com/washingtonpost/data-police-shootings
+Median Household Income 2015 - https://www.kaggle.com/kwullum/fatal-police-shootings-in-the-us?select=MedianHouseholdIncome2015.csv
+Percent Over 25 Completed High School - https://www.kaggle.com/kwullum/fatal-police-shootings-in-the-us?select=PercentOver25CompletedHighSchool.csv
+Percentage People Below Poverty Level - https://www.kaggle.com/kwullum/fatal-police-shootings-in-the-us?select=PercentagePeopleBelowPovertyLevel.csv
+Police Killings US - https://www.kaggle.com/kwullum/fatal-police-shootings-in-the-us?select=PoliceKillingsUS.csv
+Share Race By City - https://www.kaggle.com/kwullum/fatal-police-shootings-in-the-us?select=ShareRaceByCity.csv
+
+Analysis
+What is the average number of police killings by city?
+What is the share of police killings involving an unarmed person?
+What was the average age of people who died by police?
+What was the the median household income for each city with a police killing?
+What was the race demographic by city for each city with a police killing?
+What was the percent of citizens over 25 who completed high school for each city with a police killing?
+Ratio of victims who showed signs of mental illness versus those who did not
+
+
+# Data 3 - Fastest growing private companies in American from 2015 - 2020
+https://www.inc.com/inc5000/2020
+
+Analysis
+ 
+Which companies are on the list each year, or which companies show up multiple times from 2015-2020.
+For companies that show up multiple times, how has their growth percentage changed over the years?
+Which state has the most companies year by year?
+Which industry is in the lead over the years?
+
+ 
+
