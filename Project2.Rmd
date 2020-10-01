@@ -12,19 +12,25 @@ knitr::opts_chunk$set(echo = TRUE)
 libraries
 ```{r}
 #install.packages("config")
-install.packages()
 library(DBI)
 library(RCurl)
-library(config)
 ```
-Connect to DB using config file
+
+
+
 ```{r}
-dw <- config::get("datawarehouse")
 
-con <- DBI::dbConnect(RPostgres::Postgres(),
-                 dbName = dw$database,
-                 host = dw$host,
-                 port = dw$post,
-                 password = dw$password)
 ```
 
+# Data 1 - NYC Restaurant Inspection Results
+Analysis
+1) Count of violations by borough for each year
+2) Map out the violations using Latitude and Longitude
+3) Who are the repeat offenders
+4) Who has a grade or % of restaurants with a grade, and what that grade is
+5) Most frequent violation
+
+
+
+
+# Data 2 - 
