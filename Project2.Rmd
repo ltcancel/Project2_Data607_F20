@@ -10,19 +10,23 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 libraries
-```{r}
-#install.packages("config")
+```{r message=FALSE, warning=FALSE}
+install.packages("mapview")
+#install.packages("maps")
+library(maps)
 library(DBI)
 library(RCurl)
-```
-
-
-
-```{r}
-
+library(readr)
+library(ggplot2)
+library(mapview)
+library(dplyr)
+library(ggmap)
 ```
 
 # Data 1 - NYC Restaurant Inspection Results
+
+The first data set that will be analyzed are all of the NYC Restaurant Inspection results from 2019 to 10/1/2020. 
+
 Analysis
 1) Count of violations by borough for each year
 2) Map out the violations using Latitude and Longitude
@@ -30,6 +34,41 @@ Analysis
 4) Who has a grade or % of restaurants with a grade, and what that grade is
 5) Most frequent violation
 
+```{r}
+#get URL and import data from GitHub
+site <- "https://raw.githubusercontent.com/ltcancel/Project2_Data607_F20/master/DOHMH_New_York_City_Restaurant_Inspection_Results.csv"
+
+df <- read_csv(url(site))
+head(df)
+
+class(df)
+
+```
+## Tidy the data/Analysis
+```{r}
+#get the google map api key
+api <- read.delim("googleapi.txt",header = FALSE)
+
+register_google(key = api)
+#get map for brooklyn
+
+bk_df <- filter(df, BORO == "Brooklyn")
+head(bk_df)
+nyc_map <- get_map(location = "New York", maptype = "roadmap")
+
+nyc_map
+
+
+ggplot(bk_df) +
+  ggmap(nyc_map,)
+  
+ggmap(nyc_map) +
+  geom_point(aes(x=Longitude, y=Latitude), data = bk_df)
+
+
+?register_google
+
+```
 
 
 
