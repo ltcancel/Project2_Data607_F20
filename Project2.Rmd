@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 libraries
 ```{r message=FALSE, warning=FALSE}
-install.packages("mapview")
+#install.packages("mapview")
 #install.packages("maps")
 library(maps)
 library(DBI)
