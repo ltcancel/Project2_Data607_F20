@@ -103,6 +103,20 @@ What was the race demographic by city for each city with a police killing?
 What was the percent of citizens over 25 who completed high school for each city with a police killing?
 Ratio of victims who showed signs of mental illness versus those who did not
 
+```{r}
+#get data file
+site2 <- getURL("https://raw.githubusercontent.com/ltcancel/Project2_Data607_F20/master/fatal-police-shootings-data.csv")
+
+df2 <- read.csv(text = site2,sep = ",",header = TRUE)
+head(df2)
+
+```
+Plotting data
+```{r}
+ggplot(df2) +
+  geom_jitter(manner_of_death, armed)
+```
+
 
 # Data 3 - Fastest growing private companies in American from 2015 - 2020
 https://www.inc.com/inc5000/2020
