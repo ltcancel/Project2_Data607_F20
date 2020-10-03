@@ -16,7 +16,7 @@ libraries
 #install.packages("usmap")
 #install.packages("tmaptools")
 #install.packages("tmap")
-install.packages("sf")
+#install.packages("sf")
 #library(tmap)
 #library(tmaptools)
 library(sf)
@@ -27,6 +27,7 @@ library(readr)
 library(ggplot2)
 library(usmap)
 library(dplyr)
+library(tidyr)
 #library(ggmap)
 ```
 
@@ -113,8 +114,29 @@ head(df2)
 ```
 Plotting data
 ```{r}
-ggplot(df2) +
-  geom_jitter(manner_of_death, armed)
+df2<- df2 %>%
+  separate(date,sep="-",into = c("year","month","day"),remove = FALSE)
+df2
+df2 %>% group_by(year) %>% count(state)
+
+
+#top 5 states with the highest number of deaths per year
+top5 <- df2 %>% group_by(year) %>% count(state) %>% top_n(5)
+
+top5
+
+yearCount
+top_n(yearCount,5,n)
+?top_n
+?separate
+
+
+ggplot(df2, aes(x=state)) + geom_bar() + coord_flip()
+
+
+ggplot(top5) +
+  geom_bar(mapping = aes(x = year)) +
+  facet_wrap(~state)
 ```
 
 
