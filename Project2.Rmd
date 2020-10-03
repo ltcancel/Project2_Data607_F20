@@ -13,14 +13,21 @@ libraries
 ```{r message=FALSE, warning=FALSE}
 #install.packages("mapview")
 #install.packages("maps")
+#install.packages("usmap")
+#install.packages("tmaptools")
+#install.packages("tmap")
+install.packages("sf")
+#library(tmap)
+#library(tmaptools)
+library(sf)
 library(maps)
 library(DBI)
 library(RCurl)
 library(readr)
 library(ggplot2)
-library(mapview)
+library(usmap)
 library(dplyr)
-library(ggmap)
+#library(ggmap)
 ```
 
 # Data 1 - NYC Restaurant Inspection Results
@@ -39,37 +46,42 @@ Analysis
 site <- "https://raw.githubusercontent.com/ltcancel/Project2_Data607_F20/master/DOHMH_New_York_City_Restaurant_Inspection_Results.csv"
 
 df <- read_csv(url(site))
-head(df)
-
-class(df)
-
+#head(df)
 ```
 ## Tidy the data/Analysis
 ```{r}
 #get the google map api key
-api <- read.delim("googleapi.txt",header = FALSE)
+#api <- read.delim("googleapi.txt",header = FALSE)
 
-register_google(key = api)
+#register_google(key = api)
 #get map for brooklyn
 
-bk_df <- filter(df, BORO == "Brooklyn")
-head(bk_df)
-nyc_map <- get_map(location = "New York", maptype = "roadmap")
-
-nyc_map
+#bk_df <- filter(df, BORO == "Brooklyn")
+#head(bk_df)
+#nyc_map <- get_map(location = "New York", maptype = "roadmap")
 
 
-ggplot(bk_df) +
-  ggmap(nyc_map,)
-  
-ggmap(nyc_map) +
-  geom_point(aes(x=Longitude, y=Latitude), data = bk_df)
+newYork <- map_data("state", region = "new york")
+
+#create dataframe of states and group numbers
+stategroups <- data.frame("BORO" = c("Bronx","Brooklyn","Manhattan","Queens","Staten Island"),
+                          "group" = c(2,2,1,2,2))
+
+#join stategroups and df data frams to add group numbers to each boro
+df <- left_join(df, stategroups, by="BORO")
+head(df)
 
 
-?register_google
+ggplot() + 
+  geom_polygon(data = df, aes(x=Longitude, y=Latitude, group = group), color="black", fill="lightblue")
 
+?map_data
 ```
 
+```{r}
+file <- "PVS_20_v1_county_36.shp"
+nymap <- st_read(file)
+```
 
 
 # Data 2 - Police Killings Since 2015
