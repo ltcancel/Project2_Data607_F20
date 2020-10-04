@@ -2,108 +2,74 @@
 title: "Project2"
 author: "LeTicia Cancel"
 date: "9/27/2020"
-output: html_document
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-libraries
+# Introduction
+Below is a analysis of different data sets provided by classmates. This analysis will attempt to answer specific questions from the person who provided the data, or a question that seems appropriate during data tidying. 
+
+Libraries needed for analysis.
 ```{r message=FALSE, warning=FALSE}
-#install.packages("mapview")
-#install.packages("maps")
-#install.packages("usmap")
-#install.packages("tmaptools")
-#install.packages("tmap")
-#install.packages("sf")
-#library(tmap)
-#library(tmaptools)
 library(sf)
-library(maps)
 library(DBI)
 library(RCurl)
 library(readr)
 library(ggplot2)
-library(usmap)
 library(dplyr)
 library(tidyr)
-#library(ggmap)
 ```
 
-# Data 1 - NYC Restaurant Inspection Results
+# Data 1 - NYC Restaurant Inspection 
 
-The first data set that will be analyzed are all of the NYC Restaurant Inspection results from 2019 to 10/1/2020. 
+### Get Dataset 
 
-Analysis
-1) Count of violations by borough for each year
-2) Map out the violations using Latitude and Longitude
-3) Who are the repeat offenders
-4) Who has a grade or % of restaurants with a grade, and what that grade is
-5) Most frequent violation
-
-```{r}
+The first data set that will be analyzed are all of the NYC Restaurant Inspection results from 2019 to 10/1/2020. The data will be pulled from a csv file that is on GitHub.
+```{r message=FALSE,warning=FALSE}
 #get URL and import data from GitHub
 site <- "https://raw.githubusercontent.com/ltcancel/Project2_Data607_F20/master/DOHMH_New_York_City_Restaurant_Inspection_Results.csv"
-
 df <- read_csv(url(site))
-#head(df)
-```
-## Tidy the data/Analysis
-```{r}
-#get the google map api key
-#api <- read.delim("googleapi.txt",header = FALSE)
 
-#register_google(key = api)
-#get map for brooklyn
-
-#bk_df <- filter(df, BORO == "Brooklyn")
-#head(bk_df)
-#nyc_map <- get_map(location = "New York", maptype = "roadmap")
-
-
-newYork <- map_data("state", region = "new york")
-
-#create dataframe of states and group numbers
-stategroups <- data.frame("BORO" = c("Bronx","Brooklyn","Manhattan","Queens","Staten Island"),
-                          "group" = c(2,2,1,2,2))
-
-#join stategroups and df data frams to add group numbers to each boro
-df <- left_join(df, stategroups, by="BORO")
 head(df)
-
-
-ggplot() + 
-  geom_polygon(data = df, aes(x=Longitude, y=Latitude, group = group), color="black", fill="lightblue")
-
-?map_data
 ```
+### Tidy the data/Analysis
+
+Q. How many violations were issued for restaurants in each borough for each year? 
+```{r}
+#separate date into its own columns
+df <- df %>%
+  separate('INSPECTION DATE',sep="/",into = c("month","day","year"),remove = FALSE)
+
+#not every row has a value for BORO so I want to exclude this data. I also want to include anyone who does not have a violation description
+df1Filter <- df %>% group_by(year) %>% count(BORO) %>% filter(BORO != 0 & !is.na('VIOLATION DESCRIPTION'))
+
+head(df1Filter)
+```
+
+After plotting the data, we can see that the number of violations has increased over the years. Manhattan consistently has the greatest number of violations. Brooklyn and Queens are very close, and Staten Island has the least number of violations. I think this data needs further analysis to see the percentage of restaurants with violations and the percentage of restaurants with an A grade. Manhattan may have a larger number of restaurants making their violations seem inflated when compared to the other boroughs. 
 
 ```{r}
-file <- "PVS_20_v1_county_36.shp"
-nymap <- st_read(file)
+ggplot(df1Filter) +
+  geom_bar(mapping = aes(x=BORO, y = n, fill = BORO), stat = 'identity') +
+  facet_wrap(~year) +
+  coord_flip() +
+  labs(title = "Resturant Insepction Violations",x="Borough",y="Violations")
 ```
-
 
 # Data 2 - Police Killings Since 2015
-Datasets 
-Main Data - https://www.kaggle.com/kwullum/fatal-police-shootings-in-the-us
-Most recent data - https://github.com/washingtonpost/data-police-shootings
-Median Household Income 2015 - https://www.kaggle.com/kwullum/fatal-police-shootings-in-the-us?select=MedianHouseholdIncome2015.csv
-Percent Over 25 Completed High School - https://www.kaggle.com/kwullum/fatal-police-shootings-in-the-us?select=PercentOver25CompletedHighSchool.csv
-Percentage People Below Poverty Level - https://www.kaggle.com/kwullum/fatal-police-shootings-in-the-us?select=PercentagePeopleBelowPovertyLevel.csv
-Police Killings US - https://www.kaggle.com/kwullum/fatal-police-shootings-in-the-us?select=PoliceKillingsUS.csv
-Share Race By City - https://www.kaggle.com/kwullum/fatal-police-shootings-in-the-us?select=ShareRaceByCity.csv
 
-Analysis
-What is the average number of police killings by city?
-What is the share of police killings involving an unarmed person?
-What was the average age of people who died by police?
-What was the the median household income for each city with a police killing?
-What was the race demographic by city for each city with a police killing?
-What was the percent of citizens over 25 who completed high school for each city with a police killing?
-Ratio of victims who showed signs of mental illness versus those who did not
+## Introduction
+This dataset is of all Police killings from January 1, 2015 to September 27, 2020. It was collected by The Washington Post and can be found on their [GitHub](https://github.com/washingtonpost/data-police-shootings). 
 
+### Get Dataset
+First we pull the most recent csv file and create a dataframe. 
 ```{r}
 #get data file
 site2 <- getURL("https://raw.githubusercontent.com/ltcancel/Project2_Data607_F20/master/fatal-police-shootings-data.csv")
@@ -112,43 +78,70 @@ df2 <- read.csv(text = site2,sep = ",",header = TRUE)
 head(df2)
 
 ```
-Plotting data
+### Tidy the data/Analysis
+Q: Which states had the most deadly shootings from 2015 - 2020
+
+I tidied the data by splitting the date into 3 columns so I can do an analysis by year. Since this is such a large dataset, I took a subset of data that only includes the 5 states with the highest number of killings for each year. 
 ```{r}
+#Split date into year, month, and day columns so we can makes graphs based on year
 df2<- df2 %>%
   separate(date,sep="-",into = c("year","month","day"),remove = FALSE)
-df2
-df2 %>% group_by(year) %>% count(state)
-
+head(df2)
 
 #top 5 states with the highest number of deaths per year
 top5 <- df2 %>% group_by(year) %>% count(state) %>% top_n(5)
-
-top5
-
-yearCount
-top_n(yearCount,5,n)
-?top_n
-?separate
-
-
-ggplot(df2, aes(x=state)) + geom_bar() + coord_flip()
-
-
-ggplot(top5) +
-  geom_bar(mapping = aes(x = year)) +
-  facet_wrap(~state)
+head(top5)
 ```
 
+In the bar graph below, we can see that some states are on the top of the list for all 6 years. California has the greatest number of police killings each year, followed by Texas, and then Florida. 2020 is the only year where Florida has slightly more killings than Texas. Arizona has dropped from the top 5 in 2019. 
+```{r}
+#Barplot using the top 5 states with highest number of deaths per year data
+ggplot(top5) +
+  geom_bar(mapping = aes(x = state, y = n, fill = state), stat = 'identity') +
+  facet_wrap(year~.) +
+  labs(title = "Top 5 States with Deadly Shootings")
+```
 
-# Data 3 - Fastest growing private companies in American from 2015 - 2020
-https://www.inc.com/inc5000/2020
+Q: What is the average number of police killings by city?
+```{r}
+#get average shootings per year
+yearCount <- df2 %>% group_by(year) %>% count(state)
 
-Analysis
- 
-Which companies are on the list each year, or which companies show up multiple times from 2015-2020.
-For companies that show up multiple times, how has their growth percentage changed over the years?
-Which state has the most companies year by year?
-Which industry is in the lead over the years?
+
+stateAvg <- yearCount %>% 
+  group_by(state) %>%
+  summarise(Average = mean(n)) %>%
+  arrange(desc(Average))
+
+head(stateAvg)
+```
+
+This graph is a bit crowded with bars, but we can clearly see that California and Texas has the greatest average. 
+```{r}
+ggplot(stateAvg) +
+  geom_bar(mapping = aes(x = state, y = Average, fill = state), stat = 'identity') +
+  coord_flip() +
+  scale_y_continuous(breaks = seq(0,150,25))
+```
+
+Q: How many of the victims showed signs of mental illness
+
+Each year we can see a large gap in the number of killings where the victim showed signs of mental illness versus those who did not. Most were reported to not have shown signs of mental illness. 
+```{r}
+ggplot(df2) +
+  geom_bar(mapping = aes(x=year,fill=signs_of_mental_illness), position = "dodge")
+```
+
+Since the count looks very similar year over year, I created a subset of states with the highest total number of killings. There isn’t much of a significant difference. Each of the states has a gap between victims who showed signs of mental illness versus those who did not. 
+```{r}
+df2Filter <- df2 %>%
+  filter(state %in% c("AZ","CA","CO","FL","TX"))
+
+ggplot(df2Filter) +
+  geom_bar(mapping = aes(x=year, fill=signs_of_mental_illness), position = "dodge") +
+  facet_wrap(~state) +
+  coord_flip()
+```
 
  
 
